@@ -2,16 +2,32 @@
 
 class Base_Controller extends Controller {
 
+
+	protected static $navigation = array(
+		array(
+			'url' => 'home',
+			'name' => 'Home',
+		),
+		array(
+			'url' => 'about',
+			'name' => 'About',
+		),
+		array(
+			'url' => 'menu',
+			'name' => 'Menu',
+		),
+	);
+
 /**
  * Add js and stylesheets to the asset manager
  */
 	public function __construct()
 	{
-		Asset::add('jquery', '//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
+		Asset::add('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
 		Asset::add('bootstrap-js', 'js/bootstrap.min.js');
     Asset::add('bootstrap-css', 'css/bootstrap.min.css');
-    Asset::add('bootstrap-css-responsive', 'css/bootstrap-responsive.min.css', 'bootstrap-css');
     Asset::add('style', 'css/style.css');
+    Asset::add('bootstrap-css-responsive', 'css/bootstrap-responsive.min.css', 'bootstrap-css');
     parent::__construct();
 	}
 

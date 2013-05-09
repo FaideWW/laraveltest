@@ -1,1 +1,4 @@
 local/*
+
+#database config (for obvious reasons)
+database.php

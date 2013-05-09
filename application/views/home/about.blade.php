@@ -1,18 +1,13 @@
 @layout('layouts/main')
  
-@section('navigation')
-@parent
-<li><a href="about">About</a></li>
-@endsection
- 
 @section('content')
 <div class="row">
     <div class="span3">
         <div class="well sidebar-nav">
             <ul class="nav nav-list">
                 <li class="nav-header">Navigation</li>
-                @foreach ($sidenav as $sn)
-                <li @if ($sn['active']) class="active" @endif>
+                @foreach ($navigation as $sn)
+                <li @if ($sn['url'] == $active) class="active" @endif>
                     <a href="{{ $sn['url'] }}">{{ $sn['name'] }}</a>
                 </li>
                 @endforeach

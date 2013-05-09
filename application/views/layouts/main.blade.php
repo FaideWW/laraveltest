@@ -14,9 +14,11 @@
                     <a class="brand" href="home">Dumplings the Restaurant</a>
                     <div class="nav-collapse">
                         <ul class="nav">
-                            @section('navigation')
-                            <li class="active"><a href="home">Home</a></li>
-                            @yield_section
+                            @foreach ($navigation as $n)
+                            <li @if ($n['url'] == $active) class="active" @endif>
+                                <a href="{{ $n['url'] }}">{{ $n['name'] }}</a>
+                            </li>
+                            @endforeach
                         </ul>
                     </div><!--/.nav-collapse -->
                 </div>

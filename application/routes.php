@@ -37,6 +37,7 @@
 // 	return View::make('home.index');
 // });
 
+Route::get('menu/(:any)/(:any?)', 'menu@index');
 Route::controller(Controller::detect());
 Route::get('about', 'home@about');
 /*

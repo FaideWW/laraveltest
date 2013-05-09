@@ -1,9 +1,5 @@
 @layout('layouts/main')
 
-@section('navigation')
-@parent
-<li><a href="about">About</a></li>
-@endsection
 
 @section('content')
 <div class="hero-unit">
@@ -13,7 +9,17 @@
 			<p>Here be a test.</p>
 		</div>
 		<div class="span4">
-			<a href="#"><img src="http://placekitten.com/228/150" /></a>
+			<form method="POST" class="well" action="user/authenticate">
+				<fieldset>
+					<legend>Login</legend>
+					<input type="text" name="email" value="Email">
+					<input type="password" name="password" value="********"><br />
+					<label class="checkbox">
+						<input type="checkbox" name="new_user">New to Dumplings?
+					</label>
+					<input type="submit" class="btn" value="Login">
+				</fieldset>
+			</form>
 		</div>
 	</div>
 </div>
