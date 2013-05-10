@@ -5,17 +5,22 @@
 
 		public function favorites()
 		{
-			return $this->has_many_and_belongs_to('User', favorites);
+			return $this->has_many_and_belongs_to('User', 'favorites');
 		}
 
-		public function item_type()
+		public function unique_item()
 		{
-			return $this->has_one('Item_Type');
+			return $this->belongs_to('UniqueItem', 'unique_id');
 		}
 
 		public function item_size()
 		{
-			return $this->has_one('Item_Size');
+			return $this->belongs_to('ItemSize', 'size');
+		}
+
+		public function orders()
+		{
+			return $this->has_many_and_belongs_to('OrderHeader', 'orderdetails');
 		}
 
 	}

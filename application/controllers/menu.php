@@ -12,9 +12,9 @@
 		{
 			$bad_cat = Session::get('badcat');
 			$category = str_replace('_', ' ', $category);
-			$menu_categories = DB::table('item_types')->get();
+			$menu_categories = ItemType::all();
 			if ($category == 'all')
-				$items = DB::table('items')->get();
+				$items = UniqueItem::all();
 			else
 			{
 				$valid_cat = false;
@@ -24,17 +24,17 @@
 						$valid_cat = true;
 				}
 				if (!$valid_cat)
-					return Redirect::to('menu/all')->with('badcat', $category);
-				$items = DB::table('items')->where('type', '=', $category)->get();
+					return Redirect::to(self::$root_path + 'menu/all')->with('badcat', $category);
+				$items = UniqueItem::where('type', '=', $category)->get();
 			}
-			return View::make('home.menu', array(
-				'navigation' => self::$navigation,
+			$props = array_merge($this->view_array, array(
 				'active' => 'menu',
 				'active_cat' => $category,
 				'cats' => $menu_categories,
 				'items' => $items,
 				'redir' => $bad_cat
 			));
+			return View::make('home.menu', $props);
 		}
 
 	}

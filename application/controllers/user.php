@@ -19,7 +19,7 @@
 					$user->save();
 					Auth::login($user);
 
-					return Redirect::to('dashboard/index');
+					return Redirect::to(self::$root_path . 'home');
 				} 
 				catch (Exception $e)
 				{
@@ -34,7 +34,7 @@
 				);
 
 				if (Auth::attempt($credentials))
-					return Redirect::to('dashboard/index');
+					return Redirect::to(self::$root_path . 'home');
 				else
 					echo "Failed to login.";
 			}

@@ -18,6 +18,9 @@ class Base_Controller extends Controller {
 		),
 	);
 
+	protected static $root_path = 'http://www.fluffypuffgruff.com/laravel_test/';
+
+
 /**
  * Add js and stylesheets to the asset manager
  */
@@ -28,6 +31,11 @@ class Base_Controller extends Controller {
     Asset::add('bootstrap-css', 'css/bootstrap.min.css');
     Asset::add('style', 'css/style.css');
     Asset::add('bootstrap-css-responsive', 'css/bootstrap-responsive.min.css', 'bootstrap-css');
+		$this->view_array = array(
+			'root_path' => self::$root_path,
+			'navigation' => self::$navigation,
+			'active' => 'home'
+		);
     parent::__construct();
 	}
 

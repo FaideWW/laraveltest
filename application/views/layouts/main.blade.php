@@ -11,15 +11,27 @@
         <div class="navbar navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
-                    <a class="brand" href="home">Dumplings the Restaurant</a>
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="home">Dumplings</a>
                     <div class="nav-collapse">
                         <ul class="nav">
                             @foreach ($navigation as $n)
                             <li @if ($n['url'] == $active) class="active" @endif>
-                                <a href="{{ $n['url'] }}">{{ $n['name'] }}</a>
+                                <a href="{{ $root_path . $n['url'] }}">{{ $n['name'] }}</a>
                             </li>
                             @endforeach
                         </ul>
+                        @if (Auth::check() && Auth::user()->lvl == 1)
+                        <ul class="nav pull-right">
+                            <li @if ($active == 'admin') class="active" @endif>
+                                <a href="{{ $root_path }}admin">Admin</a>
+                            </li>
+                        </ul>
+                        @endif
                     </div><!--/.nav-collapse -->
                 </div>
             </div>

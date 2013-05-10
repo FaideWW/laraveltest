@@ -14,6 +14,11 @@
 		{
 			return $this->has_many_and_belongs_to('Item', 'favorites');
 		}
+
+		public function orders()
+		{
+			return $this->has_many('OrderHeader', 'customer_id');
+		}
 	}
 
 ?>

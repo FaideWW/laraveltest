@@ -32,18 +32,14 @@ class Home_Controller extends Base_Controller {
 
 	public function action_index()
 	{
-		return View::make('home.index', array(
-			'navigation' => self::$navigation,
-			'active' => 'home'
-		));
+		$props = array_merge($this->view_array, array('active' => 'home'));
+		return View::make('home.index', $props);
 	}
 
 	public function action_about()
 	{
-		return View::make('home.about', array(
-			'navigation' => self::$navigation,
-			'active' => 'about'
-		));
+		$props = array_merge($this->view_array, array('active' => 'about'));
+		return View::make('home.about', $props);
 	}
 
 }

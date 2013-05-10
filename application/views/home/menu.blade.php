@@ -7,11 +7,11 @@
 			<ul class="nav nav-list">
 				<li class="nav-header">Categories</li>
 				<li @if ($active_cat == 'all') class="active" @endif>
-					<a href="all">All</a>
+					<a href="{{ $root_path }}menu/all">All</a>
 				</li>
 				@foreach ($cats as $cat)
 					<li @if ($cat->id == $active_cat) class="active" @endif>
-						<a href="{{ $cat->slug }}">{{ $cat->id }}</a>
+						<a href="{{ $root_path . 'menu/' . $cat->slug }}">{{ $cat->id }}</a>
 					</li>
 				@endforeach
 			</ul>
