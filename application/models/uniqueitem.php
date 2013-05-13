@@ -2,6 +2,9 @@
 
 	class UniqueItem extends Eloquent
 	{
+
+		public static $timestamps = false;
+
 		public function type()
 		{
 			return $this->belongs_to('ItemType', 'type');

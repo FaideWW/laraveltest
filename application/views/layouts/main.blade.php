@@ -38,11 +38,13 @@
         </div>
  
         <div class="container">
+            @yield('notifications')
             @yield('content')
             <hr>
             <footer>
-            <p>&copy; faide 2012</p>
+            <p>&copy; faide 2013</p>
             </footer>
         </div> <!-- /container -->
+        @yield('pagescripts')
     </body>
 </html>
