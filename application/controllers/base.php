@@ -21,16 +21,17 @@ class Base_Controller extends Controller {
 	protected static $root_path = 'http://www.fluffypuffgruff.com/laravel_test/';
 
 
-/**
- * Add js and stylesheets to the asset manager
- */
 	public function __construct()
 	{
+		//load js and css assets
 		Asset::add('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js');
 		Asset::add('bootstrap-js', 'js/bootstrap.min.js');
+		Asset::add('bootstrap-filestyle-js', 'js/bootstrap-filestyle.min.js');
     Asset::add('bootstrap-css', 'css/bootstrap.min.css');
     Asset::add('style', 'css/style.css');
     Asset::add('bootstrap-css-responsive', 'css/bootstrap-responsive.min.css', 'bootstrap-css');
+
+    //initialize the view default parameters
 		$this->view_array = array(
 			'root_path' => self::$root_path,
 			'navigation' => self::$navigation,

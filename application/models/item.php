@@ -2,6 +2,8 @@
 	
 	class Item extends Eloquent
 	{
+		
+		public static $timestamps = false;
 
 		public function favorites()
 		{

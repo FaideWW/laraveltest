@@ -81,6 +81,7 @@ CREATE TABLE `uniqueitems` (
 	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR (100) NOT NULL,
 	`type` VARCHAR (20) NOT NULL,
+	`imgurl` VARCHAR (200),
 	`available` BOOLEAN NOT NULL DEFAULT 1,
 	PRIMARY KEY (`id`),
 	CONSTRAINT `FK_item_type` FOREIGN KEY `FK_item_type` (`type`)
