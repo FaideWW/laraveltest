@@ -62,14 +62,6 @@ CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- Tables for items in the store
 
-CREATE TABLE `itemsizes` (
-	`id` CHAR (1) PRIMARY KEY
-)
-ENGINE = InnoDB
-CHARACTER SET utf8 COLLATE utf8_general_ci;
-
-INSERT INTO `itemsizes` (`id`) VALUES ('S'), ('M'), ('L'), ('X');
-
 CREATE TABLE `itemtypes` (
 	`id` VARCHAR (20) PRIMARY KEY,
 	`slug` VARCHAR(20)
@@ -97,15 +89,11 @@ CREATE TABLE `items` (
 	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 	`unique_id` INTEGER UNSIGNED NOT NULL,
 	`price` DECIMAL (4,2) NOT NULL,
-	`size` CHAR (1) NOT NULL DEFAULT 'M',
+	`size` VARCHAR (5) NOT NULL DEFAULT 'M',
 	PRIMARY KEY (`id`),
 	UNIQUE INDEX `Index_unique_id_size`(`unique_id`, `size`),
 	CONSTRAINT `FK_unique_id` FOREIGN KEY `FK_unique_id` (`unique_id`)
 		REFERENCES `uniqueitems` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	CONSTRAINT `FK_item_size` FOREIGN KEY `FK_item_size` (`size`)
-		REFERENCES `itemsizes` (`id`)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 )

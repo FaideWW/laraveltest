@@ -26,11 +26,16 @@
 		@endif
 		<h1>{{ ucwords($active_cat) }}</h1>
 		<ul class="thumbnails">
-		@forelse ($items as $item)
+		@forelse ($menu as $name => $sku)
 			<li class="span3">
-				<a href="#" class="thumbnail">
-					<img src="http://placekitten.com/500/500" alt="{{ $item->name }}"
-				</a>
+				<div class="thumbnail">
+					<img src="http://placekitten.com/400/400" alt="{{ $name }}" />
+					<h3>{{ $name }}</h3>
+					<p>Description</p>
+					@foreach ($sku as $size => $price)
+						<p>({{ $size }}) ${{ $price }}</p>
+					@endforeach
+				</div>
 			</li>
 		@empty
 			</ul>

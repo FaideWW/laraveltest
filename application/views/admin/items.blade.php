@@ -24,7 +24,7 @@
 				<td class="itemType">{{ UniqueItem::find($item->unique_id)->type }}</td>
 				<td class="itemPrice">{{ $item->price }}</td>
 				<td class="itemImage">
-					<a href="#" data-name="{{ UniqueItem::find($item->unique_id)->name }}" data-source="{{ (UniqueItem::find($item->unique_id)->imgurl == null) ? 'http://placekitten.com/800/800' : UniqueItem::find($item->unique_id)->imgurl }} " class="img-modal">Click to view</a></td>
+					<a href="#" data-name="{{ UniqueItem::find($item->unique_id)->name }}" data-source="{{ (UniqueItem::find($item->unique_id)->imgurl == null) ? 'http://placekitten.com/' . rand(500,1000) . '/' .  rand(500,1000) : UniqueItem::find($item->unique_id)->imgurl }} " class="img-modal">Click to view</a></td>
 				<td class="itemAvail">@if (UniqueItem::find($item->unique_id)->available) Yes @else No @endif</td>
 				<td class="actions">
 					<button id="edit{{ $item->id }}" class="itemedit btn">Edit</button>

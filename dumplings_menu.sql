@@ -52,3 +52,10 @@ INSERT INTO `uniqueitems` (`name`, `type`, `available`) VALUES ('Water (bottle)'
 INSERT INTO `uniqueitems` (`name`, `type`, `available`) VALUES ('Won Ton Soup', 'soups', '1');
 
 INSERT INTO `items` (`unique_id`, `price`, `size`) SELECT DISTINCT `id`, '5.00', 'M' FROM `uniqueitems`;
+
+#dumplings
+
+UPDATE `items` SET `size` = 6 WHERE `items`.`unique_id` = 22;
+INSERT INTO `items` (`unique_id`, `price`, `size`) VALUES (22, 10.00, 12);
+UPDATE `items` SET `size` = 6 WHERE `items`.`unique_id` = 21;
+INSERT INTO `items` (`unique_id`, `price`, `size`) VALUES (21, 10.00, 12);

@@ -5,6 +5,8 @@
         <title>Test</title>
         {{ Asset::styles() }}
         {{ Asset::scripts() }}
+        <!-- Enable bootstrap-responsive -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
  
     <body>
@@ -25,8 +27,20 @@
                             </li>
                             @endforeach
                         </ul>
-                        @if (Auth::check() && Auth::user()->lvl == 1)
+                        <!-- Login form -->
                         <ul class="nav pull-right">
+                        @if (!Auth::check())
+                            {{ Form::open('user/authenticate', 'post', array('class' => 'navbar-form')) }}
+                                {{ Form::email('email', null, array('placeholder' => 'Email', 'class' => 'input-medium')) }}
+                                {{ Form::password('password', array('placeholder' => 'password', 'class' => 'input-medium')) }}
+                                {{ Form::submit('Login', array('class' => 'btn')) }}
+                            {{ Form::close() }}
+                        @else
+                            <li>
+                                <p class="navbar-text">Hello {{ Auth::user()->name }}!</p>
+                            </li>
+                        @endif
+                        @if (Auth::check() && Auth::user()->lvl == 1)
                             <li @if ($active == 'admin') class="active" @endif>
                                 <a href="{{ $root_path }}admin">Admin</a>
                             </li>
@@ -36,6 +50,8 @@
                 </div>
             </div>
         </div>
+
+        @yield('masthead')
  
         <div class="container">
             @yield('notifications')
