@@ -1,32 +1,28 @@
 @layout('layouts/main')
 
+@section('body-props')
+data-spy="scroll" data-target=".sidenav"
+@endsection
+
 @section('content')
 <div class="row">
-	<div class="span3">
-		<div class="well sidebar-nav">
-			<ul class="nav nav-list">
+	<div id="sidenav" class="span3">
+		<div class="well sidebar-nav sidenav">
+			<ul id="categories" class="nav nav-list">
 				<li class="nav-header">Categories</li>
-				<li @if ($active_cat == 'all') class="active" @endif>
-					<a href="{{ $root_path }}menu/all">All</a>
-				</li>
-				@foreach ($cats as $cat)
-					<li @if ($cat->id == $active_cat) class="active" @endif>
-						<a href="{{ $root_path . 'menu/' . $cat->slug }}">{{ $cat->id }}</a>
+				@foreach (array_keys($menu) as $cat)
+					<li>
+						<a href="#{{ str_replace(' ', '_', $cat) }}">{{ $cat }}</a>
 					</li>
 				@endforeach
 			</ul>
 		</div>
 	</div>
-	<div class="span9">
-		@if ($redir != NULL)
-			<div class="alert">
-				<button type="button" class="close" data-dismiss="alert">&times;</button>
-				The category <strong>{{ $redir }}</strong> does not exist.
-			</div>
-		@endif
-		<h1>{{ ucwords($active_cat) }}</h1>
-		<ul class="thumbnails">
-		@forelse ($menu as $name => $sku)
+	<div class="span9" style="margin-top: -50px">
+		@forelse ($menu as $cat => $items)
+		<h1  id="{{ str_replace(' ', '_', $cat) }}">{{ ucwords($cat) }}</h1>
+		<ul id="items" class="thumbnails">
+			@forelse ($items as $name => $sku)
 			<li class="span3">
 				<div class="thumbnail">
 					<img src="http://placekitten.com/400/400" alt="{{ $name }}" />
@@ -37,11 +33,47 @@
 					@endforeach
 				</div>
 			</li>
-		@empty
-			</ul>
-			<p>There are no items in this category.</p>
-		@endforelse
+			@empty
+				</ul>
+				<p>There are no items in this category.</p>
+			@endforelse
 		</ul>
+		@empty
+			<p>The menu is empty.</p>
+		@endforelse
 	</div>
 </div>
+@endsection
+
+@section('pagescripts')
+<script>
+
+	$(document).ready(function()
+	{
+		$('.sidenav').affix({
+			'offset': {
+				'top': function() { return $(window).width() <= 980 ? 40 : 0 }
+			}
+		});
+
+		$('.sidenav a').click(function()
+		{
+			var href = $(this).attr('href');
+			console.log('animate');
+			$('html, body').animate({
+
+				scrollTop: $(href).offset().top
+			}, 
+			200,
+			function()
+			{
+				window.location.hash = href;
+			});
+			return false;
+		});
+
+	});
+
+
+</script>
 @endsection

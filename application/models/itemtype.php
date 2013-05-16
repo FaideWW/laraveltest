@@ -3,9 +3,9 @@
 	class ItemType extends Eloquent
 	{
 
-		public static function items()
+		public function items()
 		{
-			return $this->has_many('UniqueItem');
+			return $this->has_many('UniqueItem', 'type');
 		}
 
 	}

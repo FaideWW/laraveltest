@@ -38,7 +38,7 @@
 // });
 
 Route::get('admin', 'admin@index');
-Route::get('menu/(:any)/(:any?)', 'menu@index');
+Route::get('menu', 'menu@index');
 Route::get('about', 'home@about');
 
 Route::controller(Controller::detect());
