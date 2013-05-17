@@ -39,6 +39,10 @@
 
 Route::get('admin', 'admin@index');
 Route::get('menu', 'menu@index');
+Route::get('menu/(:any)', function($cat)
+{
+	return Redirect::to('menu');
+});
 Route::get('about', 'home@about');
 
 Route::controller(Controller::detect());

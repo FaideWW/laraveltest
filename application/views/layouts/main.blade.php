@@ -19,15 +19,7 @@
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="home">Dumplings</a>
-                    <div class="nav-collapse">
-                        <ul class="nav">
-                            @foreach ($navigation as $n)
-                            <li @if ($n['url'] == $active) class="active" @endif>
-                                <a href="{{ $root_path . $n['url'] }}">{{ $n['name'] }}</a>
-                            </li>
-                            @endforeach
-                        </ul>
-                        <!-- Login form -->
+                    <!-- Login form -->
                         <ul class="nav pull-right">
                         @if (!Auth::check())
                             {{ Form::open('user/authenticate', 'post', array('class' => 'navbar-form')) }}
@@ -37,15 +29,30 @@
                             {{ Form::close() }}
                         @else
                             <li>
-                                <p class="navbar-text">Hello {{ Auth::user()->name }}!</p>
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary"><i class="icon-user icon-white"></i> {{ Auth::user()->name }}</a>
+                                    <a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href=""><i class="icon-heart"></i> Favorites</a></li>
+                                        <li><a href=""><i class="icon-cog"></i> Account</a></li>
+                                        <li><a href=""><i class="icon-off"></i> Logout</a></li>
+                                        @if (Auth::user()->lvl == 1)
+                                            <li class="divider"></li>
+                                            <li><a href="#"><i class="i"></i> Admin</a></li>
+                                        @endif
+                                    </ul>
+                                </div>
                             </li>
                         @endif
-                        @if (Auth::check() && Auth::user()->lvl == 1)
-                            <li @if ($active == 'admin') class="active" @endif>
-                                <a href="{{ $root_path }}admin">Admin</a>
-                            </li>
                         </ul>
-                        @endif
+                    <div class="nav-collapse">
+                        <ul class="nav">
+                            @foreach ($navigation as $n)
+                            <li @if ($n['url'] == $active) class="active" @endif>
+                                <a href="{{ $root_path . $n['url'] }}">{{ $n['name'] }}</a>
+                            </li>
+                            @endforeach
+                        </ul>
                     </div><!--/.nav-collapse -->
                 </div>
             </div>

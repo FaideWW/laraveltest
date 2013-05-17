@@ -38,3 +38,7 @@ publish
 
 #other
 sftp-*.json
+
+public/.sass-cache
+public/config.rb
+public/img/icon_large

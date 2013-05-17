@@ -14,19 +14,27 @@ data-spy="scroll" data-target=".sidenav"
 					<li>
 						<a href="#{{ str_replace(' ', '_', $cat) }}">{{ $cat }}</a>
 					</li>
+					@if ($cat == 'favorites')
+						<li class="divider"></li>
+					@endif
 				@endforeach
 			</ul>
 		</div>
 	</div>
-	<div class="span9" style="margin-top: -50px">
+	<div id="menu" class="span9">
 		@forelse ($menu as $cat => $items)
 		<h1  id="{{ str_replace(' ', '_', $cat) }}">{{ ucwords($cat) }}</h1>
+		<span class="divider"></span>
 		<ul id="items" class="thumbnails">
 			@forelse ($items as $name => $sku)
 			<li class="span3">
 				<div class="thumbnail">
-					<img src="http://placekitten.com/400/400" alt="{{ $name }}" />
-					<h3>{{ $name }}</h3>
+					<img class="hoverover" id="thumb_{{ $name }}" src="http://placekitten.com/400/400" alt="{{ $name }}" />
+					<div class="contenthover">
+						<button class="btn">Add to Cart</button>
+						<i class="icon-shopping-cart pull-right"></i>
+					</div>
+					<h3>{{ $name }}<i class="heart"></i></h3>
 					<p>Description</p>
 					@foreach ($sku as $size => $price)
 						<p>({{ $size }}) ${{ $price }}</p>
@@ -35,7 +43,11 @@ data-spy="scroll" data-target=".sidenav"
 			</li>
 			@empty
 				</ul>
-				<p>There are no items in this category.</p>
+				@if ($cat == 'favorites')
+					<p>You have no favorites!  Why not <a id="tooltip-favorite" href="#" data-toggle="tooltip" data-placement="right" title="To add favorites, click the heart icon on any menu item.">add some?</a></p>
+				@else
+					<p>There are no items in this category.</p>
+				@endif
 			@endforelse
 		</ul>
 		@empty
@@ -70,6 +82,16 @@ data-spy="scroll" data-target=".sidenav"
 				window.location.hash = href;
 			});
 			return false;
+		});
+
+		$('#tooltip-favorite').tooltip();
+
+		//menu item toolbar
+		$('.hoverover').contenthover({
+			overlay_background: '#000',
+			overlay_opacity: 0.5,
+			overlay_height: 40,
+			overlay_y_position: 'top'
 		});
 
 	});

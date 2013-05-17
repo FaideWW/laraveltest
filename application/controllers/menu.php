@@ -21,6 +21,7 @@
 			return View::make('home.menu', $props);
 		}
 
+
 		/**
 		 * Creates an associative array with cats and unique items as keys, and an array of all sizes and prices (from the database) as values
 		 * @param  array  $cats   Array of category records from ItemType
@@ -28,11 +29,28 @@
 		 */
 		private function createMenuArray($cats = null)
 		{
-			//if $uitems or $cats were not passed, fetch them
+			//if $cats was not passed, fetch them
 			if ($cats === null)
 				$cats = ItemType::all();
 
 			$menu = array();
+
+			//if user is logged in, add a favorites option
+			if (Auth::check())
+			{
+				$fav_array = array();
+
+				foreach(Favorite::where_user_id(Auth::user()->id)->get() as $item_id)
+				{
+					$item = Item::find($item_id);
+					$uitem = UniqueItem::find($item->unique_id);
+					$k = $uitem->name;
+					$v[$item->size] = $item->price;
+					$fav_array[$k] = $v;
+				}
+
+				$menu['favorites'] = $fav_array;
+			}
 
 			foreach ($cats as $cat)
 			{

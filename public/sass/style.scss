@@ -1,0 +1,97 @@
+@import "icon_large/*.png";
+@include all-icon_large-sprites;
+
+i.heart
+{
+  @include icon_large-sprite(heart_empty);
+  display: block;
+  width: icon_large-sprite-width(heart_empty);
+  height: icon_large-sprite-height(heart_empty);
+}
+
+body
+{
+	padding-top: 60px;
+}
+
+form.form-no-margin
+{
+	margin-bottom: 0;
+}
+
+div#menu>h1
+{
+  padding-top: 50px;
+}
+
+div#menu>h1:first
+{
+  margin-top: -50px;
+}
+
+
+ul#items>li:nth-child(3n+1)
+{
+  clear: both;
+}
+
+.thumbnails > li
+{
+	min-height: 100%;
+}
+.sidenav.affix {
+  top: 60px;
+  width: 180px;
+}
+.sidenav.affix-bottom {
+  position: absolute;
+  top: auto;
+  bottom: 180px;
+}
+
+/*
+  Widescreen
+ */
+@media (min-width: 1200px) {
+  .sidenav.affix
+  {
+    width:230px;
+  }
+}
+
+/*
+  Tablet to desktop
+ */
+@media (min-width: 768px) and (max-width: 979px) {
+  .sidenav.affix {
+    top:20px;
+    width:126px;
+  }
+}
+/*
+  Tablet
+ */
+@media (max-width: 767px) {
+  .sidenav.affix {
+    position: static;
+    width: auto;
+  }
+}
+
+/* Menu item rollover
+ -------------------*/
+
+.contenthover
+{
+  padding: 5px;
+  color: #ffffff;
+  margin: auto 0;
+}
+
+h3>i
+{
+  
+}
+
+
+
