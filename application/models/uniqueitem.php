@@ -14,6 +14,11 @@
 		{
 			return $this->has_many('Item', 'unique_id');
 		}
+		
+		public function favorites()
+		{
+			return $this->has_many_and_belongs_to('User', 'favorites');
+		}
 	}
 
 ?>

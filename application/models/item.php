@@ -5,11 +5,6 @@
 		
 		public static $timestamps = false;
 
-		public function favorites()
-		{
-			return $this->has_many_and_belongs_to('User', 'favorites');
-		}
-
 		public function unique_item()
 		{
 			return $this->belongs_to('UniqueItem', 'unique_id');

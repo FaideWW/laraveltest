@@ -12,10 +12,13 @@ data-spy="scroll" data-target=".sidenav"
 				<li class="nav-header">Categories</li>
 				@foreach (array_keys($menu) as $cat)
 					<li>
+					@if ($cat == 'favorites')
+						<a href="#{{ str_replace(' ', '_', $cat) }}"><i class="icon-star icon-blue"></i> {{ $cat }}</a>
+					</li>
+						<li class="divider"></li>
+					@else
 						<a href="#{{ str_replace(' ', '_', $cat) }}">{{ $cat }}</a>
 					</li>
-					@if ($cat == 'favorites')
-						<li class="divider"></li>
 					@endif
 				@endforeach
 			</ul>
@@ -34,10 +37,17 @@ data-spy="scroll" data-target=".sidenav"
 						<button class="btn">Add to Cart</button>
 						<i class="icon-shopping-cart pull-right"></i>
 					</div>
-					<h3>{{ $name }}<i class="heart"></i></h3>
+					<h3>{{ $name }}</h3>
 					<p>Description</p>
 					@foreach ($sku as $size => $price)
-						<p>({{ $size }}) ${{ $price }}</p>
+						<p> 
+							@if ($cat == 'favorites')
+							<i class="icon-star remove-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Un-favorite this item."></i> 
+							@else
+							<i class="icon-star-empty add-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Add this item to favorites."></i> 
+							@endif
+							({{ $size }}) ${{ $price }}
+						</p>
 					@endforeach
 				</div>
 			</li>
@@ -55,6 +65,12 @@ data-spy="scroll" data-target=".sidenav"
 		@endforelse
 	</div>
 </div>
+{{ Form::open(URL::to_action('menu@addfav'), 'POST', array('id' => 'favorite')) }}
+	<input type="hidden" name="itemname"  value="none">
+{{ Form::close() }}
+{{ Form::open(URL::to_action('menu@unfav'), 'POST', array('id' => 'unfavorite')) }}
+	<input type="hidden" name="itemname"  value="none">
+</form>
 @endsection
 
 @section('pagescripts')
@@ -92,6 +108,22 @@ data-spy="scroll" data-target=".sidenav"
 			overlay_opacity: 0.5,
 			overlay_height: 40,
 			overlay_y_position: 'top'
+		});
+
+		//add to favorite tooltip
+		$('.add-favorite').tooltip();
+		$('.add-favorite').click(function ()
+		{
+			$('form#favorite>input').val($(this).attr('id'));
+			$('form#favorite').submit();
+		});
+
+		//unfavorite tooltip
+		$('.remove-favorite').tooltip();
+		$('.remove-favorite').click(function ()
+		{
+			$('form#unfavorite>input').val($(this).attr('id'));
+			$('form#unfavorite').submit();
 		});
 
 	});

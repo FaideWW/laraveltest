@@ -39,10 +39,7 @@
 
 Route::get('admin', 'admin@index');
 Route::get('menu', 'menu@index');
-Route::get('menu/(:any)', function($cat)
-{
-	return Redirect::to('menu');
-});
+Route::get('menu/addfav', 'menu@addfav');
 Route::get('about', 'home@about');
 
 Route::controller(Controller::detect());
@@ -51,6 +48,8 @@ Route::get('logout', function()
 	Auth::logout();
 	return Redirect::to('home');
 });
+
+
 /*
 |--------------------------------------------------------------------------
 | Application 404 & 500 Error Handlers

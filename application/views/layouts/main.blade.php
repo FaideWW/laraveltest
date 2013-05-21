@@ -33,7 +33,7 @@
                                     <a href="#" class="btn btn-primary"><i class="icon-user icon-white"></i> {{ Auth::user()->name }}</a>
                                     <a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
                                     <ul class="dropdown-menu">
-                                        <li><a href=""><i class="icon-heart"></i> Favorites</a></li>
+                                        <li><a href=""><i class="icon-star"></i> Favorites</a></li>
                                         <li><a href=""><i class="icon-cog"></i> Account</a></li>
                                         <li><a href=""><i class="icon-off"></i> Logout</a></li>
                                         @if (Auth::user()->lvl == 1)

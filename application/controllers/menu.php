@@ -21,6 +21,31 @@
 			return View::make('home.menu', $props);
 		}
 
+		public function action_addfav()
+		{
+			$item = explode('_', Input::get('itemname'));
+			$uitemid = UniqueItem::where_name($item[0])->first()->id;
+			$itemid = Item::where_unique_id($uitemid)->where_size($item[1])->first()->id;
+			$fav = new Favorite;
+			$userid = Auth::user()->id;
+			$fav->user_id = $userid;
+			$fav->item_id = $itemid;
+			$fav->save();
+			return $this->action_index();
+		}
+
+		public function action_unfav()
+		{
+			$item = explode('_', Input::get('itemname'));
+			$uitemid = UniqueItem::where_name($item[0])->first()->id;
+			$itemid = Item::where_unique_id($uitemid)->where_size($item[1])->first()->id;
+			$userid = Auth::user()->id;
+			$fav = Favorite::where_user_id($userid)->where_item_id($itemid)->first();
+			if ($fav != null)
+				$fav->delete();
+			return $this->action_index();
+		}
+
 
 		/**
 		 * Creates an associative array with cats and unique items as keys, and an array of all sizes and prices (from the database) as values
@@ -40,9 +65,9 @@
 			{
 				$fav_array = array();
 
-				foreach(Favorite::where_user_id(Auth::user()->id)->get() as $item_id)
+				foreach(Favorite::where_user_id(Auth::user()->id)->get() as $fav)
 				{
-					$item = Item::find($item_id);
+					$item = Item::find($fav->item_id);
 					$uitem = UniqueItem::find($item->unique_id);
 					$k = $uitem->name;
 					$v[$item->size] = $item->price;
