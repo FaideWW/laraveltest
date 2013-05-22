@@ -84,3 +84,22 @@ form#favorite
 {
   display: none;
 }
+
+/* Fill in the star on hover */
+i.add-favorite:hover
+{
+  background-position: -120px 0;
+}
+
+/* Empty the star on hover */
+i.remove-favorite:hover
+{
+  background-position: -144px 0;
+}
+
+.notloggedin
+{
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+  opacity: 0.2;
+}

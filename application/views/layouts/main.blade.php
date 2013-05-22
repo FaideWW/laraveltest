@@ -61,8 +61,20 @@
         @yield('masthead')
  
         <div class="container">
-            @yield('notifications')
-            @yield('content')
+            @section('content')
+            <!-- Notifications section -->
+            @if (isset($notes) and !empty($notes))
+                @foreach ($notes as $n)
+                    <div class="alert alert-{{ $n['severity'] }} @if($n['isLong']) alert-block @endif">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        @if ($n['isLong']) <h4> @else <strong> @endif
+                        {{ $n['title'] }}
+                        @if ($n['isLong']) </h4> @else </strong> @endif
+                        {{ $n['message'] }}
+                    </div>
+                @endforeach
+            @endif
+            @yield_section
             <hr>
             <footer>
             <p>&copy; faide 2013</p>

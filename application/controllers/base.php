@@ -2,6 +2,7 @@
 
 class Base_Controller extends Controller {
 
+	private $notificationQueue = array();
 
 	protected static $navigation = array(
 		array(
@@ -51,6 +52,30 @@ class Base_Controller extends Controller {
 	public function __call($method, $parameters)
 	{
 		return Response::error('404');
+	}
+
+	/**
+	 * Adds a message (alert, warning, error) to the notification queue, which will be displayed in the next view.
+	 * @param  string $title    A text encoded string that represents the 
+	 * @param  string $message  An HTML encoded string to display as the body of the message.
+	 * @param  string $severity The level of notification which describes the styling (error, success, info)
+	 * @param  bool   $long     Whether or not the alert should be formatted as a long message type (alert-block)
+	 */
+	public function pushNotification($title, $message, $severity, $long=false)
+	{
+		array_push($this->notificationQueue, array('title' => $title, 'message' => $message, 'severity' => $severity, 'isLong' => $long));
+	}
+
+	/**
+	 * Returns the notification queue and emptys it
+	 * @return array The notifications to be displayed on the next view rendering.
+	 */
+	public function getNotifications()
+	{
+		$ret = $this->notificationQueue;
+		$this->notificationQueue = array();
+		return $ret;
+
 	}
 
 	/**

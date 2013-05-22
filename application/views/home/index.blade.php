@@ -10,6 +10,7 @@
 @endsection
 
 @section('content')
+@parent
 <div class="hero-unit">
 	<div class="row">
 		<h1>Dumplings the Restaurant</h1>

@@ -7,7 +7,7 @@
 
 		public function action_index()
 		{
-			$props = array_merge($this->view_array, array('active' => 'admin'));
+			$props = array_merge($this->view_array, array('active' => 'admin', 'notes' => $this->getNotifications()));
 			return View::make('admin.index', $props);
 		}
 
@@ -25,7 +25,8 @@
 				'active' => 'admin',
 				'items' => $items,
 				'uitems' => $uitems,
-				'cats' => $cats
+				'cats' => $cats, 
+				'notes' => $this->getNotifications()
 			));
 
 			//custom form macros for required fields

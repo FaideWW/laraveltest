@@ -5,6 +5,7 @@ data-spy="scroll" data-target=".sidenav"
 @endsection
 
 @section('content')
+
 <div class="row">
 	<div id="sidenav" class="span3">
 		<div class="well sidebar-nav sidenav">
@@ -25,6 +26,7 @@ data-spy="scroll" data-target=".sidenav"
 		</div>
 	</div>
 	<div id="menu" class="span9">
+@parent
 		@forelse ($menu as $cat => $items)
 		<h1  id="{{ str_replace(' ', '_', $cat) }}">{{ ucwords($cat) }}</h1>
 		<span class="divider"></span>
@@ -42,9 +44,13 @@ data-spy="scroll" data-target=".sidenav"
 					@foreach ($sku as $size => $price)
 						<p> 
 							@if ($cat == 'favorites')
-							<i class="icon-star remove-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Un-favorite this item."></i> 
+							<i class="icon-star favorite remove-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Un-favorite this item."></i> 
 							@else
-							<i class="icon-star-empty add-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Add this item to favorites."></i> 
+								@if (Auth::check())
+								<i class="icon-star-empty favorite add-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Add this item to favorites."></i> 
+								@else
+								<i class="icon-star-empty favorite notloggedin" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="You must be logged in to add favorites."></i> 
+								@endif
 							@endif
 							({{ $size }}) ${{ $price }}
 						</p>
@@ -54,7 +60,9 @@ data-spy="scroll" data-target=".sidenav"
 			@empty
 				</ul>
 				@if ($cat == 'favorites')
-					<p>You have no favorites!  Why not <a id="tooltip-favorite" href="#" data-toggle="tooltip" data-placement="right" title="To add favorites, click the heart icon on any menu item.">add some?</a></p>
+					<div class="alert alert-info">
+						<strong>You have no favorites!</strong>  Why not <a id="tooltip-favorite" href="#" data-toggle="tooltip" data-placement="right" title="To add favorites, click the heart icon on any menu item.">add some?</a>
+					</div>
 				@else
 					<p>There are no items in this category.</p>
 				@endif
@@ -111,15 +119,13 @@ data-spy="scroll" data-target=".sidenav"
 		});
 
 		//add to favorite tooltip
-		$('.add-favorite').tooltip();
+		$('.favorite').tooltip();
 		$('.add-favorite').click(function ()
 		{
 			$('form#favorite>input').val($(this).attr('id'));
 			$('form#favorite').submit();
 		});
 
-		//unfavorite tooltip
-		$('.remove-favorite').tooltip();
 		$('.remove-favorite').click(function ()
 		{
 			$('form#unfavorite>input').val($(this).attr('id'));

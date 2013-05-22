@@ -16,13 +16,18 @@
 
 			$props = array_merge($this->view_array, array(
 				'active' => 'menu',
-				'menu' => $menu
+				'menu' => $menu, 
+				'notes' => $this->getNotifications()
 			));
 			return View::make('home.menu', $props);
 		}
 
 		public function action_addfav()
 		{
+			if (!Auth::check())
+			{
+				return $this->action_index();
+			}
 			$item = explode('_', Input::get('itemname'));
 			$uitemid = UniqueItem::where_name($item[0])->first()->id;
 			$itemid = Item::where_unique_id($uitemid)->where_size($item[1])->first()->id;
@@ -46,6 +51,16 @@
 			return $this->action_index();
 		}
 
+		public function action_test_notifications()
+		{	
+			$this->pushNotification('Warning!', 'This is a notification test.', 'warning');
+			$this->pushNotification('Alert!', 'This is another notification test.', 'info');
+			$this->pushNotification('Error!', 'Here\'s a third.', 'error');
+			$this->pushNotification('Hey!', 'This one is a bit longer so we need to use the longer notation for displaying large messages without breaking the styling on the default notification block.', 'warning', true);
+			
+			return $this->action_index();
+		}
+
 
 		/**
 		 * Creates an associative array with cats and unique items as keys, and an array of all sizes and prices (from the database) as values
@@ -64,9 +79,9 @@
 			if (Auth::check())
 			{
 				$fav_array = array();
-
 				foreach(Favorite::where_user_id(Auth::user()->id)->get() as $fav)
 				{
+					$v = array();
 					$item = Item::find($fav->item_id);
 					$uitem = UniqueItem::find($item->unique_id);
 					$k = $uitem->name;
