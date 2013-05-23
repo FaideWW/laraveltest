@@ -34,11 +34,7 @@ data-spy="scroll" data-target=".sidenav"
 			@forelse ($items as $name => $sku)
 			<li class="span3">
 				<div class="thumbnail">
-					<img class="hoverover" id="thumb_{{ $name }}" src="http://placekitten.com/400/400" alt="{{ $name }}" />
-					<div class="contenthover">
-						<button class="btn">Add to Cart</button>
-						<i class="icon-shopping-cart pull-right"></i>
-					</div>
+					<img class="menuitem" id="thumb_{{ $name }}" src="{{ URL::to_asset('img/ktn.jpg') }}" alt="{{ $name }}" />
 					<h3>{{ $name }}</h3>
 					<p>Description</p>
 					@foreach ($sku as $size => $price)
@@ -73,11 +69,13 @@ data-spy="scroll" data-target=".sidenav"
 		@endforelse
 	</div>
 </div>
-{{ Form::open(URL::to_action('menu@addfav'), 'POST', array('id' => 'favorite')) }}
-	<input type="hidden" name="itemname"  value="none">
+{{ Form::open(URL::to_action('menu@index'), 'POST', array('id' => 'favorite')) }}
+	<input id="itemname" type="hidden" name="itemname"  value="none">
+	<input type="hidden" name="form_action"  value="addfav">
 {{ Form::close() }}
-{{ Form::open(URL::to_action('menu@unfav'), 'POST', array('id' => 'unfavorite')) }}
-	<input type="hidden" name="itemname"  value="none">
+{{ Form::open(URL::to_action('menu@index'), 'POST', array('id' => 'unfavorite')) }}
+	<input id="itemname" type="hidden" name="itemname"  value="none">
+	<input type="hidden" name="form_action"  value="delfav">
 </form>
 @endsection
 
@@ -110,25 +108,17 @@ data-spy="scroll" data-target=".sidenav"
 
 		$('#tooltip-favorite').tooltip();
 
-		//menu item toolbar
-		$('.hoverover').contenthover({
-			overlay_background: '#000',
-			overlay_opacity: 0.5,
-			overlay_height: 40,
-			overlay_y_position: 'top'
-		});
-
 		//add to favorite tooltip
 		$('.favorite').tooltip();
 		$('.add-favorite').click(function ()
 		{
-			$('form#favorite>input').val($(this).attr('id'));
+			$('form#favorite>input#itemname').val($(this).attr('id'));
 			$('form#favorite').submit();
 		});
 
 		$('.remove-favorite').click(function ()
 		{
-			$('form#unfavorite>input').val($(this).attr('id'));
+			$('form#unfavorite>input#itemname').val($(this).attr('id'));
 			$('form#unfavorite').submit();
 		});
 

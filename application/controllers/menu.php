@@ -10,6 +10,18 @@
 		 */
 		public function action_index()
 		{
+
+			//check for POST data
+			$action = Input::get('form_action');
+			
+			if (Auth::check())
+			{
+				if ($action == 'addfav')
+					$this->arrayPushNotification($this->action_addfav());
+				else if ($action == 'delfav')
+					$this->arrayPushNotification($this->action_unfav());
+			}
+
 			$cats = ItemType::all();
 
 			$menu = $this->createMenuArray($cats);
@@ -23,11 +35,7 @@
 		}
 
 		public function action_addfav()
-		{
-			if (!Auth::check())
-			{
-				return $this->action_index();
-			}
+		{	
 			$item = explode('_', Input::get('itemname'));
 			$uitemid = UniqueItem::where_name($item[0])->first()->id;
 			$itemid = Item::where_unique_id($uitemid)->where_size($item[1])->first()->id;
@@ -36,11 +44,17 @@
 			$fav->user_id = $userid;
 			$fav->item_id = $itemid;
 			$fav->save();
-			return $this->action_index();
+			
+			return array(
+				'title' => 'Success!',
+				'message' => $item[0] . ' has been added to your favorites.',
+				'severity' => 'success'
+			);
+
 		}
 
 		public function action_unfav()
-		{
+		{			
 			$item = explode('_', Input::get('itemname'));
 			$uitemid = UniqueItem::where_name($item[0])->first()->id;
 			$itemid = Item::where_unique_id($uitemid)->where_size($item[1])->first()->id;
@@ -48,7 +62,12 @@
 			$fav = Favorite::where_user_id($userid)->where_item_id($itemid)->first();
 			if ($fav != null)
 				$fav->delete();
-			return $this->action_index();
+						
+			return array(
+				'title' => 'Success!',
+				'message' => $item[0] . ' has been removed from your favorites.',
+				'severity' => 'success'
+			);
 		}
 
 		public function action_test_notifications()

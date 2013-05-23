@@ -11,7 +11,7 @@ form.form-no-margin {
 
 /* line 23, ../sass/style.scss */
 div#menu > h1 {
-  padding-top: 50px;
+  padding-top: 25px;
 }
 
 /* line 28, ../sass/style.scss */
@@ -27,6 +27,11 @@ ul#items > li:nth-child(3n+1) {
 /* line 39, ../sass/style.scss */
 .thumbnails > li {
   min-height: 100%;
+}
+
+img.menuitem
+{
+  min-width: 100%;
 }
 
 /* line 42, ../sass/style.scss */
@@ -59,6 +64,11 @@ ul#items > li:nth-child(3n+1) {
   .sidenav.affix {
     top: 20px;
     width: 126px;
+  }
+
+  div#menu>h1
+  {
+    padding-top: 0;
   }
 }
 /*

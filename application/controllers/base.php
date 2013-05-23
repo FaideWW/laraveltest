@@ -37,7 +37,8 @@ class Base_Controller extends Controller {
 		$this->view_array = array(
 			'root_path' => self::$root_path,
 			'navigation' => self::$navigation,
-			'active' => 'home'
+			'active' => 'home',
+			'notes' => array()
 		);
     parent::__construct();
 	}
@@ -64,6 +65,15 @@ class Base_Controller extends Controller {
 	public function pushNotification($title, $message, $severity, $long=false)
 	{
 		array_push($this->notificationQueue, array('title' => $title, 'message' => $message, 'severity' => $severity, 'isLong' => $long));
+	}
+
+  /**
+   * Decomposes the property array and calls pushNotification
+   * @param  array  $props An associative array formatted with the properties of the above pushNotification() method
+   */
+	public function arrayPushNotification($props)
+	{
+		$this->pushNotification($props['title'], $props['message'], $props['severity'], (array_key_exists('long', $props) ? $props['long'] : false));
 	}
 
 	/**
