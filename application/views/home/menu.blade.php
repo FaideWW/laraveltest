@@ -8,6 +8,7 @@ data-spy="scroll" data-target=".sidenav"
 
 <div class="row">
 	<div id="sidenav" class="span3">
+
 		<div class="well sidebar-nav sidenav">
 			<ul id="categories" class="nav nav-list">
 				<li class="nav-header">Categories</li>
@@ -24,6 +25,7 @@ data-spy="scroll" data-target=".sidenav"
 				@endforeach
 			</ul>
 		</div>
+
 	</div>
 	<div id="menu" class="span9">
 @parent
@@ -33,7 +35,7 @@ data-spy="scroll" data-target=".sidenav"
 		<ul id="items" class="thumbnails">
 			@forelse ($items as $name => $sku)
 			<li class="span3">
-				<div class="thumbnail">
+				<div class="thumbnail" data-toggle="tooltip" data-placement="top" title="Add this item to your cart.">
 					<img class="menuitem" id="thumb_{{ $name }}" src="{{ URL::to_asset('img/ktn.jpg') }}" alt="{{ $name }}" />
 					<h3>{{ $name }}</h3>
 					<p>Description</p>
@@ -84,6 +86,10 @@ data-spy="scroll" data-target=".sidenav"
 
 	$(document).ready(function()
 	{
+
+		var cartIsEmpty = true;
+		var cartArray = {};
+
 		$('.sidenav').affix({
 			'offset': {
 				'top': function() { return $(window).width() <= 980 ? 40 : 0 }
@@ -110,17 +116,147 @@ data-spy="scroll" data-target=".sidenav"
 
 		//add to favorite tooltip
 		$('.favorite').tooltip();
-		$('.add-favorite').click(function ()
+		$('.add-favorite').click(function (e)
 		{
+			//stop from accidentally adding the item to the cart
+			e.stopPropagation();
 			$('form#favorite>input#itemname').val($(this).attr('id'));
 			$('form#favorite').submit();
 		});
 
-		$('.remove-favorite').click(function ()
+		$('.remove-favorite').click(function (e)
 		{
+			//stop from accidentally adding the item to the cart
+			e.stopPropagation();
 			$('form#unfavorite>input#itemname').val($(this).attr('id'));
 			$('form#unfavorite').submit();
 		});
+
+		//thumbnail tooltip
+		$('.thumbnail').tooltip();
+
+		//thumbnail hover effects
+		$('.thumbnail').hover(function()
+		{
+			$(this).css({
+				'border-color': '#08c',
+				'cursor': 'pointer'
+			});
+		}, function()
+		{
+			$(this).css({
+				'border-color': '#ddd',
+				'cursor': 'auto'
+			});
+		});
+
+		//thumbnail add to cart on click
+		$('.thumbnail').click(function()
+		{
+			addToCart($(this).find('h3').text());
+		});
+
+		var addToCart = function(item)
+		{
+			if (cartIsEmpty)
+				initCart();
+
+			if (item in cartArray)
+			{
+				cartArray[item]++;
+			}else{
+				cartArray[item] = 1;
+			}
+
+			redrawCart();
+		};
+
+		/* Insert cart markup and functionality
+		 --------------------------------------*/
+		var initCart = function()
+		{
+			cartIsEmpty = false;
+			$('<li/>', {
+				class: 'divider shopping-cart'
+			}).appendTo('ul#categories');
+
+			$('<li/>', {
+				id: 'cart-header',
+				class: 'nav-header shopping-cart',
+				text: 'My Cart'
+			}).appendTo('ul#categories');
+
+			$('<button/>', {
+				id: 'close-cart',
+				class: 'close shopping-cart',
+				text: '×',
+				type: 'button'
+			}).appendTo('#cart-header');
+
+			$('<div/>', {
+				id: 'cart-container',
+				class: 'shopping-cart',
+			}).appendTo('div.sidenav');
+
+			$('button#close-cart').click(function()
+			{
+				uninitCart();
+			});
+		}
+
+		var uninitCart = function()
+		{
+			cartIsEmpty = true;
+			cartArray = {};
+			$('.shopping-cart').remove();
+		}
+
+		var redrawCart = function()
+		{
+			$('#cart-container').empty();
+
+			for (var item in cartArray)
+			{
+				$('<form/>', {
+					id: slug(item),
+					class: 'form-inline cart-form'
+				}).appendTo('#cart-container');
+
+				$('<input/>', {
+					id: slug(item) + '_q',
+					type: 'text',
+					class: 'input-tiny',
+					value: cartArray[item]
+				}).appendTo('form#' + slug(item));
+
+				$('<span/>', {
+					id: slug(item) + '_l',
+					class: 'help-inline',
+					text: item
+				}).appendTo('form#' + slug(item));
+			}
+			console.log(JSON.stringify(cartArray));
+		}
+
+		//Transform encoded text into slug format
+		var slug = function(text)
+		{
+			text = text.replace(/^\s+|\s+$/g, ''); // trim
+		  text = text.toLowerCase();
+
+		  // remove accents, swap ñ for n, etc
+		  var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+		  var to   = "aaaaaeeeeeiiiiooooouuuunc------";
+		  for (var i=0, l=from.length ; i<l ; i++) {
+		    text = text.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+		  }
+
+		  text = text.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+		    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+		    .replace(/-+/g, '-'); // collapse dashes
+
+		  return text;
+		};
 
 	});
 

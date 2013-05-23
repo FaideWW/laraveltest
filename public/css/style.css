@@ -113,3 +113,18 @@ i.remove-favorite:hover
   filter: alpha(opacity=20);
   opacity: 0.2;
 }
+
+input.input-tiny
+{
+  width: 20px;
+}
+
+div#cart-container
+{
+  font-size: small;
+}
+
+form.cart-form
+{
+  margin: 0 0 5px;
+}
