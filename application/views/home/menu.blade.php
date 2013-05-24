@@ -35,12 +35,12 @@ data-spy="scroll" data-target=".sidenav"
 		<ul id="items" class="thumbnails">
 			@forelse ($items as $name => $sku)
 			<li class="span3">
-				<div class="thumbnail" data-toggle="tooltip" data-placement="top" title="Add this item to your cart.">
+				<div class="thumbnail">
 					<img class="menuitem" id="thumb_{{ $name }}" src="{{ URL::to_asset('img/ktn.jpg') }}" alt="{{ $name }}" />
 					<h3>{{ $name }}</h3>
 					<p>Description</p>
 					@foreach ($sku as $size => $price)
-						<p> 
+						<p class="item" data-toggle="tooltip" data-placement="top" title="Add this item to your cart."> 
 							@if ($cat == 'favorites')
 							<i class="icon-star favorite remove-favorite" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="Un-favorite this item."></i> 
 							@else
@@ -50,7 +50,7 @@ data-spy="scroll" data-target=".sidenav"
 								<i class="icon-star-empty favorite notloggedin" id="{{ $name }}_{{ $size }}" data-toggle="tooltip" data-placement="top" title="You must be logged in to add favorites."></i> 
 								@endif
 							@endif
-							({{ $size }}) ${{ $price }}
+							<span class="item" data-toggle="tooltip" data-placement="top" title="Add this item to your cart." data-item-size="{{ $size }}" data-item-price="{{ $price }}">({{ $size }}) ${{ $price }}</span>
 						</p>
 					@endforeach
 				</div>
@@ -133,39 +133,46 @@ data-spy="scroll" data-target=".sidenav"
 		});
 
 		//thumbnail tooltip
-		$('.thumbnail').tooltip();
+		$('span.item').tooltip();
 
 		//thumbnail hover effects
-		$('.thumbnail').hover(function()
+		$('span.item').hover(function()
 		{
 			$(this).css({
-				'border-color': '#08c',
+				'color': '#08c',
 				'cursor': 'pointer'
 			});
 		}, function()
 		{
 			$(this).css({
-				'border-color': '#ddd',
+				'color': '#000',
 				'cursor': 'auto'
 			});
 		});
 
 		//thumbnail add to cart on click
-		$('.thumbnail').click(function()
+		$('span.item').click(function()
 		{
-			addToCart($(this).find('h3').text());
+			addToCart($(this).parent().siblings('h3').text(), $(this).attr('data-item-size'), $(this).attr('data-item-price'));
 		});
 
-		var addToCart = function(item)
+		var addToCart = function(item, size, price)
 		{
 			if (cartIsEmpty)
 				initCart();
 
-			if (item in cartArray)
+			var i = item + size;
+
+			if (i in cartArray)
 			{
-				cartArray[item]++;
+				cartArray[i]['quantity']++;
 			}else{
-				cartArray[item] = 1;
+				cartArray[i] = {
+					'name': item,
+					'size': size, 
+					'price': price, 
+					'quantity': 1
+				};
 			}
 
 			redrawCart();
@@ -193,9 +200,9 @@ data-spy="scroll" data-target=".sidenav"
 				type: 'button'
 			}).appendTo('#cart-header');
 
-			$('<div/>', {
+			$('<ul/>', {
 				id: 'cart-container',
-				class: 'shopping-cart',
+				class: 'shopping-cart nav nav-list',
 			}).appendTo('div.sidenav');
 
 			$('button#close-cart').click(function()
@@ -217,23 +224,28 @@ data-spy="scroll" data-target=".sidenav"
 
 			for (var item in cartArray)
 			{
-				$('<form/>', {
-					id: slug(item),
-					class: 'form-inline cart-form'
+				var itemid = slug(item) + '_li';
+
+				$('<li/>', {
+					id: itemid,
+					class: 'cart-item clearfix'
 				}).appendTo('#cart-container');
 
-				$('<input/>', {
-					id: slug(item) + '_q',
-					type: 'text',
-					class: 'input-tiny',
-					value: cartArray[item]
-				}).appendTo('form#' + slug(item));
+				$('<span/>', {
+					class: 'item-quantity',
+					text: cartArray[item]['quantity']
+				}).appendTo('#' + itemid);
 
 				$('<span/>', {
-					id: slug(item) + '_l',
-					class: 'help-inline',
-					text: item
-				}).appendTo('form#' + slug(item));
+					class: 'pull-left',
+					text: cartArray[item]['name'] +  '(' + cartArray[item]['size'] + ')'
+				}).appendTo('#' + itemid);
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: (cartArray[item]['price'] * cartArray[item]['quantity']).toFixed(2)
+				}).appendTo('#' + itemid);
+
 			}
 			console.log(JSON.stringify(cartArray));
 		}

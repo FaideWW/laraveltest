@@ -124,7 +124,13 @@ div#cart-container
   font-size: small;
 }
 
-form.cart-form
+li.cart-item
 {
-  margin: 0 0 5px;
+  padding-bottom: 10px;
+}
+
+li.cart-item>span.item-quantity
+{
+  float: left;
+  margin-left: -20px;
 }
