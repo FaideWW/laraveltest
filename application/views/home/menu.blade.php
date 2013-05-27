@@ -29,6 +29,7 @@ data-spy="scroll" data-target=".sidenav"
 	</div>
 	<div id="menu" class="span9">
 @parent
+		<div id="menu-smallwindow"></div>
 		@forelse ($menu as $cat => $items)
 		<h1  id="{{ str_replace(' ', '_', $cat) }}">{{ ucwords($cat) }}</h1>
 		<span class="divider"></span>
@@ -69,6 +70,7 @@ data-spy="scroll" data-target=".sidenav"
 		@empty
 			<p>The menu is empty.</p>
 		@endforelse
+
 	</div>
 </div>
 {{ Form::open(URL::to_action('menu@index'), 'POST', array('id' => 'favorite')) }}
@@ -183,32 +185,74 @@ data-spy="scroll" data-target=".sidenav"
 		var initCart = function()
 		{
 			cartIsEmpty = false;
+			$('<ul/>', {
+				class: 'nav navlist shopping-cart',
+				id: 'shopping-cart-handle'
+			}).appendTo('div.sidenav');
 			$('<li/>', {
 				class: 'divider shopping-cart'
-			}).appendTo('ul#categories');
+			}).appendTo('ul#shopping-cart-handle');
 
 			$('<li/>', {
 				id: 'cart-header',
 				class: 'nav-header shopping-cart',
 				text: 'My Cart'
-			}).appendTo('ul#categories');
+			}).appendTo('ul#shopping-cart-handle');
 
 			$('<button/>', {
 				id: 'close-cart',
 				class: 'close shopping-cart',
 				text: '×',
-				type: 'button'
+				type: 'button',
+				'data-toggle': 'tooltip',
+				title: 'Empty this cart.'
 			}).appendTo('#cart-header');
+
+			$('button#close-cart').tooltip();
 
 			$('<ul/>', {
 				id: 'cart-container',
 				class: 'shopping-cart nav nav-list',
-			}).appendTo('div.sidenav');
+			}).appendTo('ul#shopping-cart-handle');
 
 			$('button#close-cart').click(function()
 			{
 				uninitCart();
 			});
+
+			$('<div/>', {
+				id: 'cart-items'
+			}).appendTo('#cart-container');
+
+			$('<div/>', {
+				id: 'cart-totals'
+			}).appendTo('#cart-container');
+
+			checkWindow();
+		}
+
+		$(window).resize(function()
+		{
+			checkWindow();
+		});
+		var checkWindow = function()
+		{
+			if ($(window).height() < 675)
+			{
+				if ($('#shopping-cart-handle').parent() != $('#menu-smallwindow'))
+				{
+					var cart = $('#shopping-cart-handle').detach();
+					$('#menu-smallwindow').append(cart);
+					redrawCart();
+				}
+			}else{
+				if ($('#shopping-cart-handle').parent() != $('div.sidenav'))
+				{
+					var cart = $('#shopping-cart-handle').detach();
+					$('div.sidenav').append(cart);
+					redrawCart();
+				}
+			}
 		}
 
 		var uninitCart = function()
@@ -216,13 +260,17 @@ data-spy="scroll" data-target=".sidenav"
 			cartIsEmpty = true;
 			cartArray = {};
 			$('.shopping-cart').remove();
+
 		}
 
 		var redrawCart = function()
 		{
-			$('#cart-container').empty();
+			$('#cart-items').empty();
+			$('#cart-totals').empty();
+			$('button#cart-checkout').remove();
 
 			var subtotal = 0;
+
 
 			for (var item in cartArray)
 			{
@@ -232,7 +280,7 @@ data-spy="scroll" data-target=".sidenav"
 				$('<li/>', {
 					id: itemid,
 					class: 'cart-item clearfix'
-				}).appendTo('#cart-container');
+				}).appendTo('#cart-items');
 
 				$('<span/>', {
 					class: 'item-quantity',
@@ -249,36 +297,97 @@ data-spy="scroll" data-target=".sidenav"
 					text: price
 				}).appendTo('#' + itemid);
 
-				subtotal += price; 
+				subtotal += parseFloat(price); 
 
 			}
 
 			var taxes = (subtotal * 0.05).toFixed(2);
-			var total = subtotal + taxes;
+			var total = (subtotal + parseFloat(taxes)).toFixed(2);
+
 
 			$('<li/>', {
-					id: itemid,
 					class: 'divider'
-				}).appendTo('#cart-container');
+				}).appendTo('#cart-totals');
 
 			$('<li/>', {
-					id: itemid,
+					id: 'subtotal',
 					class: 'cart-item clearfix'
-				}).appendTo('#cart-container');
+				}).appendTo('#cart-totals');
 
 			$('<span/>', {
 					class: 'pull-left',
 					text: 'Subtotal'
-				}).appendTo('#' + itemid);
+				}).appendTo('#subtotal');
 
 				$('<span/>', {
 					class: 'pull-right',
-					text: subtotal
-				}).appendTo('#' + itemid);
+					text: '$' + subtotal
+				}).appendTo('#subtotal');
 
+			$('<li/>', {
+					id: 'taxes',
+					class: 'cart-item clearfix'
+				}).appendTo('#cart-totals');
 
-			console.log(JSON.stringify(cartArray));
+				$('<span/>', {
+					class: 'pull-left',
+					text: 'Tax (5%)'
+				}).appendTo('#taxes');
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: '$' + taxes
+				}).appendTo('#taxes');
+
+			$('<li/>', {
+					id: 'total',
+					class: 'cart-item clearfix'
+				}).appendTo('#cart-totals');
+
+				$('<span/>', {
+					class: 'pull-left',
+					text: 'Total'
+				}).appendTo('#total');
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: '$' + total
+				}).appendTo('#total');
+
+				$('<button/>', {
+					id: 'cart-checkout',
+					type: 'submit',
+					class: 'btn btn-primary pull-right shopping-cart',
+					text: 'Checkout'
+				}).appendTo('ul#shopping-cart-handle');
+
+			var max_cart_height = $(window).height() - ($('#cart-container').offset().top - $(window).scrollTop()) - ($('#cart-totals').height() + 70);
+			console.log(max_cart_height);
+
+			var max_items_height = max_cart_height - $('#cart-container').height();
+
+			$('#cart-items').css({
+				'max-height': max_cart_height,
+				'overflow': 'auto',
+			});
+
+			console.log('cart-items.height(): ' + $('#cart-items').height());
+			console.log('max_cart_height: ' + max_cart_height);
+
+			$('#cart-items').mCustomScrollbar({'theme': 'dark-thick'});
+			$('#cart-items').mCustomScrollbar("scrollTo","last", {scrollInertia: 0});
+
+			if ($('#cart-items').height() == max_cart_height)
+			{
+				$('#cart-items').css('margin-right', '-30px');
+			}else{
+				$('#cart-items').css('margin-right', '0px');
+			}
+
+			
 		}
+
+
 
 		//Transform encoded text into slug format
 		var slug = function(text)

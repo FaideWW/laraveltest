@@ -132,5 +132,5 @@ li.cart-item
 li.cart-item>span.item-quantity
 {
   float: left;
-  margin-left: -20px;
+  margin-left: -15px;
 }

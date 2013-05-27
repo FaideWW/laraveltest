@@ -29,7 +29,10 @@ class Base_Controller extends Controller {
 		Asset::add('bootstrap-js', 'js/bootstrap.min.js');
 		Asset::add('bootstrap-filestyle-js', 'js/bootstrap-filestyle.min.js');
 		Asset::add('jquery-contenthover-js', 'js/jquery.contenthover.min.js');
+		Asset::add('jquery-mousewheel-js', 'js/jquery.mousewheel.min.js');
+		Asset::add('jquery-customscrollbar-js', 'js/jquery.mCustomScrollbar.min.js');
     Asset::add('bootstrap-css', 'css/bootstrap.min.css');
+    Asset::add('jquery-customscrollbar-css', 'css/jquery.mCustomScrollbar.css');
     Asset::add('style', 'css/style.css');
     Asset::add('bootstrap-css-responsive', 'css/bootstrap-responsive.min.css', 'bootstrap-css');
 
