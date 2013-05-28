@@ -40,8 +40,11 @@
 Route::get('admin', 'admin@index');
 Route::get('menu', 'menu@index');
 Route::get('menu/addfav', 'menu@addfav');
+Route::get('menu/checkout', 'menu@checkout');
 Route::get('menu/unfav', 'menu@unfav');
 Route::get('menu/test_notifications', 'menu@test_notifications');
+Route::post('menu/savecart', 'menu@savecart');
+Route::post('menu/unsavecart', 'menu@unsavecart');
 Route::get('about', 'home@about');
 
 Route::controller(Controller::detect());

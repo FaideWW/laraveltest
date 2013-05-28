@@ -26,9 +26,12 @@
 
 			$menu = $this->createMenuArray($cats);
 
+			$cart = json_encode(Session::get('cart'));
+
 			$props = array_merge($this->view_array, array(
 				'active' => 'menu',
 				'menu' => $menu, 
+				'cart' => $cart,
 				'notes' => $this->getNotifications()
 			));
 			return View::make('home.menu', $props);
@@ -68,6 +71,62 @@
 				'message' => $item[0] . ' has been removed from your favorites.',
 				'severity' => 'success'
 			);
+		}
+
+		public function action_savecart()
+		{
+			if (!Request::ajax())
+				return Redirect::to_action('menu@index');
+			$cart = Input::get();
+			Session::put('cart', $cart);
+			return Response::json($cart);
+		}
+
+		public function action_unsavecart()
+		{
+			if (!Request::ajax())
+				return Redirect::to_action('menu@index');
+			Session::forget('cart');
+			return Response::json("{status:'success'}");
+		}
+
+		public function action_checkout()
+		{
+			if (!Session::has('cart'))
+				return Redirect::to_action('menu@index');
+
+			$cart = Session::get('cart');
+			$finalcart = array();
+			foreach($cart as $it)
+			{
+				$itemprops = json_decode($it, true);
+				$itemprops = reset($itemprops);
+				$itemname = $itemprops['name'];
+				$uniqueitem = UniqueItem::where_name($itemname)->first();
+				$item = Item::where_unique_id($uniqueitem->id)->where_size($itemprops['size'])->first();
+				if ($item != null)
+				{
+					//format item for cart display
+					
+					$fitem = array(
+						'id' => $item->id,
+						'name' => $uniqueitem->name,
+						'size' => $item->size,
+						'price' => $item->price,
+						'quantity' => $itemprops['quantity']
+					);
+					$finalcart[] = $fitem;
+				}
+			}
+
+			$props = array_merge($this->view_array, array(
+				'active' => 'menu',
+				'finalcart' => $finalcart,
+				'notes' => $this->getNotifications()
+			));
+
+			return View::make('home.checkout', $props);
+
 		}
 
 		public function action_test_notifications()

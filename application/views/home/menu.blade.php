@@ -80,7 +80,9 @@ data-spy="scroll" data-target=".sidenav"
 {{ Form::open(URL::to_action('menu@index'), 'POST', array('id' => 'unfavorite')) }}
 	<input id="itemname" type="hidden" name="itemname"  value="none">
 	<input type="hidden" name="form_action"  value="delfav">
-</form>
+{{ Form::close() }}
+{{ Form::open(URL::to_action('menu@checkout'), 'POST', array('id' => 'checkout')) }}
+{{ Form::close() }}
 @endsection
 
 @section('pagescripts')
@@ -88,6 +90,339 @@ data-spy="scroll" data-target=".sidenav"
 
 	$(document).ready(function()
 	{
+
+		var addToCart = function(item, size, price)
+		{
+			if (cartIsEmpty)
+				initCart();
+
+			var i = item + size;
+
+			if (i in cartArray)
+			{
+				cartArray[i]['quantity']++;
+			}else{
+				cartArray[i] = {
+					'name': item,
+					'size': size, 
+					'price': price, 
+					'quantity': 1
+				};
+			}
+
+			redrawCart();
+			saveCart();
+		};
+
+		var removeFromCart = function(item)
+		{
+			if (cartArray[item] != undefined)
+			delete cartArray[item];
+
+			//IE<8 compatibility hack
+			if (!Object.keys) {
+		    Object.keys = function (obj) {
+		        var keys = [],
+		            k;
+		        for (k in obj) {
+		            if (Object.prototype.hasOwnProperty.call(obj, k)) {
+		                keys.push(k);
+		            }
+		        }
+		        return keys;
+		    };
+		  }
+		  if (Object.keys(cartArray).length == 0)
+		  {
+		   cartIsEmpty = true;
+		  }
+		  saveCart();
+			redrawCart();
+		}
+
+		/* Insert cart markup and functionality
+		 --------------------------------------*/
+		var initCart = function()
+		{
+			cartIsEmpty = false;
+			$('<ul/>', {
+				class: 'nav navlist shopping-cart',
+				id: 'shopping-cart-handle'
+			}).appendTo('div.sidenav');
+			$('#shopping-cart-handle').hide();
+			$('<li/>', {
+				class: 'divider shopping-cart'
+			}).appendTo('ul#shopping-cart-handle');
+
+			$('<li/>', {
+				id: 'cart-header',
+				class: 'nav-header shopping-cart',
+				text: 'My Cart'
+			}).appendTo('ul#shopping-cart-handle');
+
+			$('<button/>', {
+				id: 'close-cart',
+				class: 'close shopping-cart',
+				text: '×',
+				type: 'button',
+				'data-toggle': 'tooltip',
+				title: 'Empty this cart.'
+			}).appendTo('#cart-header');
+
+			$('button#close-cart').tooltip();
+
+			$('<ul/>', {
+				id: 'cart-container',
+				class: 'shopping-cart nav nav-list',
+			}).appendTo('ul#shopping-cart-handle');
+
+			$('button#close-cart').click(function()
+			{
+				uninitCart();
+				unloadCart();
+			});
+
+			$('<div/>', {
+				id: 'cart-items'
+			}).appendTo('#cart-container');
+
+			$('<div/>', {
+				id: 'cart-totals'
+			}).appendTo('#cart-container');
+
+			checkWindow();
+			$('#shopping-cart-handle').slideDown();
+		}
+
+		var checkWindow = function()
+		{
+			if ($(window).height() < 675 || $(window).width() < 980)
+			{
+				if ($('#shopping-cart-handle').parent() != $('#menu-smallwindow'))
+				{
+					var cart = $('#shopping-cart-handle').detach();
+					$('#menu-smallwindow').append(cart);
+					redrawCart();
+				}
+			}else{
+				if ($('#shopping-cart-handle').parent() != $('div.sidenav'))
+				{
+					var cart = $('#shopping-cart-handle').detach();
+					$('div.sidenav').append(cart);
+					redrawCart();
+				}
+			}
+		}
+
+		var uninitCart = function()
+		{
+			$('#shopping-cart-handle').slideUp({
+				complete: function()
+				{
+					cartIsEmpty = true;
+					cartArray = {};
+					$('.shopping-cart').remove();
+				}
+			});
+		}
+
+		var redrawCart = function()
+		{
+
+			if (cartIsEmpty)
+			{
+				unloadCart();
+				uninitCart();
+				return;
+			}
+
+			$('#cart-items').empty();
+			$('#cart-totals').empty();
+			$('button#cart-checkout').remove();
+
+			var subtotal = 0;
+
+
+			for (var item in cartArray)
+			{
+				var itemid = slug(item) + '_li';
+				var price = (cartArray[item]['price'] * cartArray[item]['quantity']).toFixed(2);
+
+				$('<li/>', {
+					id: itemid,
+					class: 'cart-item clearfix'
+				}).appendTo('#cart-items');
+
+				$('<span/>', {
+					class: 'item-quantity',
+					text: cartArray[item]['quantity']
+				}).appendTo('#' + itemid);
+
+				$('<span/>', {
+					class: 'pull-left cart-item-name',
+					id: itemid + '_name',
+					text: cartArray[item]['name'] +  '(' + cartArray[item]['size'] + ')'
+				}).appendTo('#' + itemid);
+
+				$('<button/>', {
+					type: 'button',
+					class: 'close pull-left',
+					id: 'rm_' + itemid,
+					text: '×',
+					'data-toggle': 'tooltip',
+					'data-itemtorm': item,
+					title: 'Remove this item from your cart.',
+				}).prependTo('#' + itemid + '_name');
+
+				$('#rm_' + itemid).tooltip(
+				{
+					placement: 'right'
+				}).click(function()
+				{
+					removeFromCart($(this).attr('data-itemtorm'));
+				});
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: price
+				}).appendTo('#' + itemid);
+
+				subtotal += parseFloat(price); 
+
+			}
+
+			var taxes = (subtotal * 0.05).toFixed(2);
+			var total = (subtotal + parseFloat(taxes)).toFixed(2);
+
+
+			$('<li/>', {
+					class: 'divider'
+				}).appendTo('#cart-totals');
+
+			$('<li/>', {
+					id: 'subtotal',
+					class: 'cart-item clearfix'
+				}).appendTo('#cart-totals');
+
+			$('<span/>', {
+					class: 'pull-left',
+					text: 'Subtotal'
+				}).appendTo('#subtotal');
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: '$' + subtotal
+				}).appendTo('#subtotal');
+
+			$('<li/>', {
+					id: 'taxes',
+					class: 'cart-item clearfix'
+				}).appendTo('#cart-totals');
+
+				$('<span/>', {
+					class: 'pull-left',
+					text: 'Tax (5%)'
+				}).appendTo('#taxes');
+
+				$('<span/>', {
+					class: 'pull-right',
+					text: '$' + taxes
+				}).appendTo('#taxes');
+
+			$('<li/>', {
+				id: 'total',
+				class: 'cart-item clearfix'
+			}).appendTo('#cart-totals');
+
+			$('<span/>', {
+				class: 'pull-left',
+				text: 'Total'
+			}).appendTo('#total');
+
+			$('<span/>', {
+				class: 'pull-right',
+				text: '$' + total
+			}).appendTo('#total');
+
+			$('<button/>', {
+				id: 'cart-checkout',
+				type: 'submit',
+				class: 'btn btn-primary pull-right shopping-cart',
+				text: 'Checkout'
+			}).appendTo('ul#shopping-cart-handle');
+
+			$('button#cart-checkout').click(function()
+			{
+				$('form#checkout').submit();
+			});
+
+			var max_cart_height = $(window).height() - ($('#cart-container').offset().top - $(window).scrollTop()) - ($('#cart-totals').height() + 70);
+
+			var max_items_height = max_cart_height - $('#cart-container').height();
+
+			$('#cart-items').css({
+				'max-height': max_cart_height,
+				'overflow': 'auto',
+			});
+
+			$('#cart-items').mCustomScrollbar({'theme': 'dark-thick'});
+			$('#cart-items').mCustomScrollbar("scrollTo","last", {scrollInertia: 0});
+
+			if ($('#cart-items').height() == max_cart_height)
+			{
+				$('#cart-items').css('margin-right', '-30px');
+			}else{
+				$('#cart-items').css('margin-right', '0px');
+			}
+		}
+
+		//POST shopping cart to Session
+		var saveCart = function()
+		{
+			$.ajax({
+				url: 'menu/savecart',
+				data: {cart: JSON.stringify(cartArray)},
+				type: 'POST'
+			});
+		}
+
+		//Overwrite POSTed shopping cart with an empty array
+		var unloadCart = function()
+		{
+			$.ajax({
+				url: 'menu/unsavecart',
+				type: 'POST',
+			});
+		}
+
+		var loadCart = function(data)
+		{
+			cartArray = JSON.parse(data);
+			if (cartIsEmpty)
+				initCart();
+			redrawCart();
+		}
+
+		//Transform encoded text into slug format
+		var slug = function(text)
+		{
+			text = text.replace(/^\s+|\s+$/g, ''); // trim
+		  text = text.toLowerCase();
+
+		  // remove accents, swap ñ for n, etc
+		  var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+		  var to   = "aaaaaeeeeeiiiiooooouuuunc------";
+		  for (var i=0, l=from.length ; i<l ; i++) {
+		    text = text.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+		  }
+
+		  text = text.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+		    .replace(/\s+/g, '-') // collapse whitespace and replace by -
+		    .replace(/-+/g, '-'); // collapse dashes
+
+		  return text;
+		};
+
 
 		var cartIsEmpty = true;
 		var cartArray = {};
@@ -101,7 +436,6 @@ data-spy="scroll" data-target=".sidenav"
 		$('.sidenav a').click(function()
 		{
 			var href = $(this).attr('href');
-			console.log('animate');
 			$('html, body').animate({
 
 				scrollTop: $(href).offset().top
@@ -158,256 +492,15 @@ data-spy="scroll" data-target=".sidenav"
 			addToCart($(this).parent().siblings('h3').text(), $(this).attr('data-item-size'), $(this).attr('data-item-price'));
 		});
 
-		var addToCart = function(item, size, price)
-		{
-			if (cartIsEmpty)
-				initCart();
-
-			var i = item + size;
-
-			if (i in cartArray)
-			{
-				cartArray[i]['quantity']++;
-			}else{
-				cartArray[i] = {
-					'name': item,
-					'size': size, 
-					'price': price, 
-					'quantity': 1
-				};
-			}
-
-			redrawCart();
-		};
-
-		/* Insert cart markup and functionality
-		 --------------------------------------*/
-		var initCart = function()
-		{
-			cartIsEmpty = false;
-			$('<ul/>', {
-				class: 'nav navlist shopping-cart',
-				id: 'shopping-cart-handle'
-			}).appendTo('div.sidenav');
-			$('<li/>', {
-				class: 'divider shopping-cart'
-			}).appendTo('ul#shopping-cart-handle');
-
-			$('<li/>', {
-				id: 'cart-header',
-				class: 'nav-header shopping-cart',
-				text: 'My Cart'
-			}).appendTo('ul#shopping-cart-handle');
-
-			$('<button/>', {
-				id: 'close-cart',
-				class: 'close shopping-cart',
-				text: '×',
-				type: 'button',
-				'data-toggle': 'tooltip',
-				title: 'Empty this cart.'
-			}).appendTo('#cart-header');
-
-			$('button#close-cart').tooltip();
-
-			$('<ul/>', {
-				id: 'cart-container',
-				class: 'shopping-cart nav nav-list',
-			}).appendTo('ul#shopping-cart-handle');
-
-			$('button#close-cart').click(function()
-			{
-				uninitCart();
-			});
-
-			$('<div/>', {
-				id: 'cart-items'
-			}).appendTo('#cart-container');
-
-			$('<div/>', {
-				id: 'cart-totals'
-			}).appendTo('#cart-container');
-
-			checkWindow();
-		}
+		var cart = ({{ $cart }});
+		if (cart !== null && !$.isEmptyObject(JSON.parse(cart.cart)))
+			loadCart(cart.cart);
 
 		$(window).resize(function()
 		{
 			checkWindow();
 		});
-		var checkWindow = function()
-		{
-			if ($(window).height() < 675)
-			{
-				if ($('#shopping-cart-handle').parent() != $('#menu-smallwindow'))
-				{
-					var cart = $('#shopping-cart-handle').detach();
-					$('#menu-smallwindow').append(cart);
-					redrawCart();
-				}
-			}else{
-				if ($('#shopping-cart-handle').parent() != $('div.sidenav'))
-				{
-					var cart = $('#shopping-cart-handle').detach();
-					$('div.sidenav').append(cart);
-					redrawCart();
-				}
-			}
-		}
 
-		var uninitCart = function()
-		{
-			cartIsEmpty = true;
-			cartArray = {};
-			$('.shopping-cart').remove();
-
-		}
-
-		var redrawCart = function()
-		{
-			$('#cart-items').empty();
-			$('#cart-totals').empty();
-			$('button#cart-checkout').remove();
-
-			var subtotal = 0;
-
-
-			for (var item in cartArray)
-			{
-				var itemid = slug(item) + '_li';
-				var price = (cartArray[item]['price'] * cartArray[item]['quantity']).toFixed(2);
-
-				$('<li/>', {
-					id: itemid,
-					class: 'cart-item clearfix'
-				}).appendTo('#cart-items');
-
-				$('<span/>', {
-					class: 'item-quantity',
-					text: cartArray[item]['quantity']
-				}).appendTo('#' + itemid);
-
-				$('<span/>', {
-					class: 'pull-left',
-					text: cartArray[item]['name'] +  '(' + cartArray[item]['size'] + ')'
-				}).appendTo('#' + itemid);
-
-				$('<span/>', {
-					class: 'pull-right',
-					text: price
-				}).appendTo('#' + itemid);
-
-				subtotal += parseFloat(price); 
-
-			}
-
-			var taxes = (subtotal * 0.05).toFixed(2);
-			var total = (subtotal + parseFloat(taxes)).toFixed(2);
-
-
-			$('<li/>', {
-					class: 'divider'
-				}).appendTo('#cart-totals');
-
-			$('<li/>', {
-					id: 'subtotal',
-					class: 'cart-item clearfix'
-				}).appendTo('#cart-totals');
-
-			$('<span/>', {
-					class: 'pull-left',
-					text: 'Subtotal'
-				}).appendTo('#subtotal');
-
-				$('<span/>', {
-					class: 'pull-right',
-					text: '$' + subtotal
-				}).appendTo('#subtotal');
-
-			$('<li/>', {
-					id: 'taxes',
-					class: 'cart-item clearfix'
-				}).appendTo('#cart-totals');
-
-				$('<span/>', {
-					class: 'pull-left',
-					text: 'Tax (5%)'
-				}).appendTo('#taxes');
-
-				$('<span/>', {
-					class: 'pull-right',
-					text: '$' + taxes
-				}).appendTo('#taxes');
-
-			$('<li/>', {
-					id: 'total',
-					class: 'cart-item clearfix'
-				}).appendTo('#cart-totals');
-
-				$('<span/>', {
-					class: 'pull-left',
-					text: 'Total'
-				}).appendTo('#total');
-
-				$('<span/>', {
-					class: 'pull-right',
-					text: '$' + total
-				}).appendTo('#total');
-
-				$('<button/>', {
-					id: 'cart-checkout',
-					type: 'submit',
-					class: 'btn btn-primary pull-right shopping-cart',
-					text: 'Checkout'
-				}).appendTo('ul#shopping-cart-handle');
-
-			var max_cart_height = $(window).height() - ($('#cart-container').offset().top - $(window).scrollTop()) - ($('#cart-totals').height() + 70);
-			console.log(max_cart_height);
-
-			var max_items_height = max_cart_height - $('#cart-container').height();
-
-			$('#cart-items').css({
-				'max-height': max_cart_height,
-				'overflow': 'auto',
-			});
-
-			console.log('cart-items.height(): ' + $('#cart-items').height());
-			console.log('max_cart_height: ' + max_cart_height);
-
-			$('#cart-items').mCustomScrollbar({'theme': 'dark-thick'});
-			$('#cart-items').mCustomScrollbar("scrollTo","last", {scrollInertia: 0});
-
-			if ($('#cart-items').height() == max_cart_height)
-			{
-				$('#cart-items').css('margin-right', '-30px');
-			}else{
-				$('#cart-items').css('margin-right', '0px');
-			}
-
-			
-		}
-
-
-
-		//Transform encoded text into slug format
-		var slug = function(text)
-		{
-			text = text.replace(/^\s+|\s+$/g, ''); // trim
-		  text = text.toLowerCase();
-
-		  // remove accents, swap ñ for n, etc
-		  var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
-		  var to   = "aaaaaeeeeeiiiiooooouuuunc------";
-		  for (var i=0, l=from.length ; i<l ; i++) {
-		    text = text.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-		  }
-
-		  text = text.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
-		    .replace(/\s+/g, '-') // collapse whitespace and replace by -
-		    .replace(/-+/g, '-'); // collapse dashes
-
-		  return text;
-		};
 
 	});
 

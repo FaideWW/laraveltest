@@ -129,6 +129,11 @@ li.cart-item
   padding-bottom: 10px;
 }
 
+.cart-item-name
+{
+  font-weight: bold;
+}
+
 li.cart-item>span.item-quantity
 {
   float: left;
