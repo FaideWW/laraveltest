@@ -22,6 +22,9 @@
 					$this->arrayPushNotification($this->action_unfav());
 			}
 
+			if (Session::has('notification-error'))
+				$this->pushNotification('', Session::get('notification-error'), 'error');
+
 			$cats = ItemType::all();
 
 			$menu = $this->createMenuArray($cats);
@@ -90,20 +93,20 @@
 			return Response::json("{status:'success'}");
 		}
 
-		public function action_checkout()
+		public function action_checkout($cart=null)
 		{
-			if (!Session::has('cart'))
+			if ($cart === null and !Session::has('cart'))
 				return Redirect::to_action('menu@index');
 
-			$cart = Session::get('cart');
+			if ($cart === null)
+				$cart = Session::get('cart');
+			$parsed_cart = json_decode($cart['cart']);
 			$finalcart = array();
-			foreach($cart as $it)
+			foreach($parsed_cart as $item => $itemprops)
 			{
-				$itemprops = json_decode($it, true);
-				$itemprops = reset($itemprops);
-				$itemname = $itemprops['name'];
+				$itemname = $itemprops->name;
 				$uniqueitem = UniqueItem::where_name($itemname)->first();
-				$item = Item::where_unique_id($uniqueitem->id)->where_size($itemprops['size'])->first();
+				$item = Item::where_unique_id($uniqueitem->id)->where_size($itemprops->size)->first();
 				if ($item != null)
 				{
 					//format item for cart display
@@ -113,7 +116,7 @@
 						'name' => $uniqueitem->name,
 						'size' => $item->size,
 						'price' => $item->price,
-						'quantity' => $itemprops['quantity']
+						'quantity' => $itemprops->quantity
 					);
 					$finalcart[] = $fitem;
 				}
@@ -122,11 +125,40 @@
 			$props = array_merge($this->view_array, array(
 				'active' => 'menu',
 				'finalcart' => $finalcart,
+				'jsoncart' => $cart['cart'],
 				'notes' => $this->getNotifications()
 			));
 
 			return View::make('home.checkout', $props);
+		}
 
+		public function action_checkout_confirm()
+		{
+			if (!Session::has('cart'))
+				return Redirect::to_action('menu@index')->with('notification-error', 'Your session has expired.  Please re-create your order.');
+
+			if (Request::header('x-pjax'))
+			{
+				return View::make('pjax.confirmcheckout');
+			}else{
+				return View::make('home.confirmcheckout');
+			}
+
+		}
+
+
+
+
+		public function action_checkout_test()
+		{
+			$cart = json_decode('{"cart":"{\"Beef Rice BowlM\":{\"name\":\"Beef Rice Bowl\",\"size\":\"M\",\"price\":\"5.00\",\"quantity\":1},\"Chicken WingsM\":{\"name\":\"Chicken Wings\",\"size\":\"M\",\"price\":\"5.00\",\"quantity\":1},\"Sweet Potato FriesM\":{\"name\":\"Sweet Potato Fries\",\"size\":\"M\",\"price\":\"5.00\",\"quantity\":1},\"Thai Chili PrawnsM\":{\"name\":\"Thai Chili Prawns\",\"size\":\"M\",\"price\":\"5.00\",\"quantity\":2}}"}', true);
+			return $this->action_checkout($cart);
+		}
+
+		public function action_jsontest()
+		{
+			$s = '{"Beef Rice BowlM":{"name":"Beef Rice Bowl","size":"M","price":"5.00","quantity":1},"Chicken WingsM":{"name":"Chicken Wings","size":"M","price":"5.00","quantity":1},"Sweet Potato FriesM":{"name":"Sweet Potato Fries","size":"M","price":"5.00","quantity":1},"Thai Chili PrawnsM":{"name":"Thai Chili Prawns","size":"M","price":"5.00","quantity":2}}';
+			var_dump(json_decode($s));
 		}
 
 		public function action_test_notifications()

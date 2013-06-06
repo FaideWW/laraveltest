@@ -139,3 +139,15 @@ li.cart-item>span.item-quantity
   float: left;
   margin-left: -15px;
 }
+
+span.remove-item
+{
+  font-size: 1.5em;
+  color: #aaa;
+}
+
+span.remove-item:hover
+{
+  cursor: pointer;
+  color: #b94a48;
+}

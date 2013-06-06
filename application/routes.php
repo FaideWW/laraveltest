@@ -41,11 +41,15 @@ Route::get('admin', 'admin@index');
 Route::get('menu', 'menu@index');
 Route::get('menu/addfav', 'menu@addfav');
 Route::get('menu/checkout', 'menu@checkout');
+Route::get('menu/checkout/confirm', 'menu@checkout_confirm');
+Route::get('menu/checkout/test', 'menu@checkout_test');
 Route::get('menu/unfav', 'menu@unfav');
 Route::get('menu/test_notifications', 'menu@test_notifications');
 Route::post('menu/savecart', 'menu@savecart');
 Route::post('menu/unsavecart', 'menu@unsavecart');
 Route::get('about', 'home@about');
+
+Route::get('menu/jsontest', 'menu@jsontest');
 
 Route::controller(Controller::detect());
 Route::get('logout', function()

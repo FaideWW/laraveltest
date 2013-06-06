@@ -16,7 +16,7 @@
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>c
                     </a>
                     <a class="brand" href="home">Dumplings</a>
                     <!-- Login form -->
@@ -77,7 +77,7 @@
             @yield_section
             <hr>
             <footer>
-            <p>&copy; faide 2013</p>
+            <p>&copy; dumplings 2013</p>
             </footer>
         </div> <!-- /container -->
         @yield('pagescripts')
